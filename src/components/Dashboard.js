@@ -11,20 +11,10 @@ import { Table, Row, Cell } from "../../shared/components/Table/Table";
 import Pagination from "./Pagination";
 import {  useSelector } from "react-redux";
 
+
 const Dashboard = () => {
   const history = useHistory();
-  const {
-    projects,
-    allProjects,
-    loading,
-    load,
-    totalPages,
-    currentPage,
-    projectsPerPage,
-    deleteProject,
-    refreshData,
-    getAllProject,
-  } = useContext(ProjectsContext);
+  const { projects, allProjects, loading, load, totalPages, currentPage, projectsPerPage, deleteProject, refreshData, getAllProject} = useContext(ProjectsContext);
   const { user } = useContext(AuthContext);
   const [showArchivedModal, setShowArchivedModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,35 +23,27 @@ const Dashboard = () => {
   const [projectId, setProjectId] = useState("");
   const clearSearch = () => setSearchQuery("");
 
+
   let dashboardData = useSelector((state) => state.dashboard.items);
-  let paginate = useSelector((state) => state.dashboard.paginate);
+  let isLoaded = useSelector((state) => state.dashboard.isLoaded);
+  let myPaginateData = useSelector((state) => state.dashboard.myPaginatonData);
+  // console.log("🚀  myPaginateData:", myPaginateData)
 
-  console.log(paginate[0], "paginatedd");
 
-  console.log(typeof paginate, "typsss");
 
   const columnConfig = [
     { key: "hasNewEvents", displayName: "", width: "0%" },
     { key: "num", displayName: "Project Code", width: "14%", sortable: true },
     { key: "name", displayName: "Name", width: "32%", sortable: true },
     // { key: "userProjectRole", displayName: "Permissions", width: "12%" },
-    { key: "sheetCount", displayName: "Sheets", width: "12%", sortable: true },
+    { key: "sheetCount", displayName: "Sheets",width: "12%", sortable: true },
     { key: "teamSize", displayName: "Team", width: "12%", sortable: true },
     { key: "status", displayName: "Status", width: "12%", sortable: true },
-    {
-      key: "updatedAt",
-      displayName: "Last Updated",
-      width: "17%",
-      sortable: true,
-    },
+    { key: "updatedAt", displayName: "Last Updated", width: "17%", sortable: true },
   ];
 
   if (user.humanizedRole === "Super Admin") {
-    columnConfig.push({
-      key: "archived",
-      displayName: "Archive",
-      width: "12%",
-    });
+    columnConfig.push({ key: "archived", displayName: "Archive", width: "12%" });
   }
 
   const columnFormatters = {
@@ -84,17 +66,16 @@ const Dashboard = () => {
     ),
   };
 
-  let filteredProjects = dashboardData.map((p) => ({
+  let filteredProjects = projects.map((p) => ({
     id: p.id,
     num: p.num,
     name: p.name,
-    sheetCount: (p.Sheets || []).length,
-    teamSize: p.userCount || [],
+    sheetCount: (p.Sheets || []).length ,
+    teamSize: (p.userCount || []),
     status: p.status,
     updatedAt: p.updatedAt || Date.now(), // Date.now() is temp fix, p.updatedAt doesn't exist when new project is added
     hasNewEvents: p.lastVersionSeen < p.latestVersion,
   }));
-  console.log("🚀 filteredProjects:", filteredProjects);
 
   columnConfig.forEach((col) => (col.sortBy = col.key === sortedBy.key));
 
@@ -112,7 +93,7 @@ const Dashboard = () => {
     getAllProject();
   }, []);
 
-  let allProjectsData = dashboardData.map((p) => ({
+  let allProjectsData = allProjects.map((p) => ({
     id: p.id,
     num: p.num,
     name: p.name,
@@ -129,20 +110,11 @@ const Dashboard = () => {
       [p.name, p.num].some((_p) => (_p || "").toLowerCase().includes(q))
     );
   }
-
   const sortedProjects = filteredProjects.sort(
     objSort(sortedBy.key, sortedBy.asc)
   );
-  // console.log(sortedProjects,"sortedProjects............")
-  // console.log("Dashboard ...................", dashboardData.length)
 
-  // dashboardData = filteredProjects.sort(
-  //   objSort(sortedBy.key, sortedBy.asc)
-  //   );
-
-  // console.log("Dashboard ", dashboardData.length)
-
-  const noMatches = !filteredProjects.length && !!dashboardData.length;
+  const noMatches = !filteredProjects.length && !!projects.length;
 
   useEffect(() => {
     refreshData();
@@ -172,23 +144,19 @@ const Dashboard = () => {
   const goToPage = (page) => {
     refreshData(page);
   };
-  const onChangeShow = () => {
-    setShowCompletedProjects(!showCompletedProjects);
-  };
-  // use this getCurrentPageData to map
-  const getCurrentPageData = () => {
-    return paginate[currentPage - 1] || [];
-  };
+  const onChangeShow=()=>{
+    setShowCompletedProjects(!showCompletedProjects)
+  }
+  console.log(myPaginateData[currentPage] )
+
 
   return (
     <>
       <Subheader
         searchValue={searchQuery}
-        projects={dashboardData}
+        projects={allProjects}
         clearSearch={clearSearch}
-        onSearch={(e) => {
-          setSearchQuery(e.target.value);
-        }}
+        onSearch={(e) => { setSearchQuery(e.target.value) }}
         onClickNewProject={toggleShowNewProjectModal}
       />
       <main className="min-h-screen p-1 md:p-4 lg:p-5 bg-blueGray-100">
@@ -201,8 +169,8 @@ const Dashboard = () => {
               onClickSort={onClickSort}
               ascending={sortedBy.asc}
             >
-              {paginate[0].map((project) => (
-                <Row
+            { (myPaginateData[currentPage] || sortedProjects).map((project) => (
+              <Row
                   key={project.id}
                   className="bg-white cursor-pointer hover:bg-blueGray-50"
                   onClick={() => {
@@ -210,6 +178,7 @@ const Dashboard = () => {
                     setProjectId(project.id);
                   }}
                 >
+                
                   {columnConfig.map((col) => {
                     if (col.key === "name")
                       return (

@@ -4,27 +4,12 @@ const dashboardSlice = createSlice({
   name: "prjcts",
   initialState: {
     items: [],
-    paginate: [],
     isLoaded: false,
+    myPaginatonData: {}, 
   },
   reducers: {
     setPrjcts: (state, action) => {
       state.items = action.payload;
-
-      const totalProjects = action.payload.length;
-      // console.log(totalProjects, "total projects ");
-      const numOfPages = Math.ceil(totalProjects / 20);
-      // console.log("🚀 numOfPages:", numOfPages);
-
-      state.paginate = Array.from({ length: numOfPages }, (_, i) => {
-        const start = i * 20;
-        const end = (i + 1) * 20;
-        const projectSlice = action.payload.slice(start, end);
-        return projectSlice;
-      });
-
-      // console.log(state.paginate[0], "paginateee");
-
       state.isLoaded = true;
     },
 
@@ -33,8 +18,15 @@ const dashboardSlice = createSlice({
         (project) => project.id !== action.payload
       );
     },
+
+    updateMyPaginatonData: (state, action) => {
+      const { data, page } = action.payload;
+      state.myPaginatonData = {
+        ...state.myPaginatonData,
+        [page]: data, 
+      };
+    },
   },
 });
-
-export const { setPrjcts, removePrjct } = dashboardSlice.actions;
+export const { setPrjcts, removePrjct, updateMyPaginatonData } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
