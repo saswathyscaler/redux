@@ -7,6 +7,7 @@ import {
   setPrjcts,
   removePrjct,
   updateMyPaginatonData,
+  removeProjectFromPage,setToPages
 } from "dashboard/features/dashboardSlice";
 
 export const ProjectsContext = React.createContext({
@@ -37,19 +38,23 @@ export const ProjectsContextProvider = ({ children }) => {
   const [allProjects, setAllProjects] = useState([]);
 
   const dispatch = useDispatch();
-  const isLoaded = useSelector((state) => state.dashboard.isLoaded);
   const dashboardData = useSelector((state) => state.dashboard.items);
   let myPaginateData = useSelector((state) => state.dashboard.myPaginatonData);
+ let tPages = useSelector ((state)=>state.dashboard.totalPages)
+
+
 
   const refreshData = (page = 1) => {
+
     const existingPageData = myPaginateData[page];
-    console.log("🚀 ~  existingPageData:", existingPageData?.length)
-    if (existingPageData?.length) {
+    if (existingPageData?.length ) {
       console.log("existingggggg");
       setProjects(existingPageData);
-      setTotalPages(totalPages);
+      setTotalPages(tPages);
       console.log(page,"page")
       setCurrentPage(page > totalPages ? 1 : page);
+      setLoading(false);
+
     } else {
       console.log("not existing");
       const onSuccess = (response) => {
@@ -58,19 +63,25 @@ export const ProjectsContextProvider = ({ children }) => {
         setTotalPages(totalPages);
         setCurrentPage(page > totalPages ? 1 : page);
         dispatch(updateMyPaginatonData({ data, page }));
+        dispatch(setToPages(totalPages));
         setLoading(false);
-        console.log("projectPerPage...............", page);
+        // console.log("projectPerPage...............", page);
       };
       const onError = (err) => {
         showErrorToast(err);
         setLoading(false);
       };
       if (projectsPerPage === "All") {
-        get(
+       console.log(dashboardData,"dashboardData")
+        setProjects(dashboardData)
+        if(!dashboardData.length){
+            get(
           `/api/projects?projectsPerPage=${projectsPerPage}&complete=${showComplete}`,
           onSuccess,
           onError
-        );
+        ); 
+        }
+
       } 
       else {
         console.log("Else block is executing....")
@@ -84,13 +95,15 @@ export const ProjectsContextProvider = ({ children }) => {
       }
     }
   };
-
   const getAllProject = () => {
+    if (dashboardData?.length) {
+      setAllProjects(dashboardData)
+      setLoad(false);
+    } else {
     setLoad(true);
     const onSuccess = (projects) => {
       setAllProjects(projects.data);
       dispatch(setPrjcts(projects.data));
-
       setLoad(false);
     };
     const onError = (err) => {
@@ -103,6 +116,7 @@ export const ProjectsContextProvider = ({ children }) => {
       onError
     );
   };
+    }
   useEffect(() => {
     getAllProject();
     refreshData(currentPage);
@@ -112,6 +126,7 @@ export const ProjectsContextProvider = ({ children }) => {
     const onSuccess = (newProject) => {
       // setProjects((prev) => [newProject, ...prev]);
       dispatch(setPrjcts([...dashboardData, newProject]));
+
 
       if (callback) callback();
     };
@@ -127,16 +142,21 @@ export const ProjectsContextProvider = ({ children }) => {
   // * TODO: remove archieved projects from the store
 
   const deleteProject = (projects, callback) => {
-    console.log("🚀  ~ projects:", projects);
+    // console.log(myPaginateData[currentPage])
     const onSuccess = (newProject) => {
       dispatch(removePrjct(projects));
+      dispatch(removeProjectFromPage({ page: currentPage, projectId: projects }));
+      const existingPageData = myPaginateData[currentPage];
+      setProjects(existingPageData)
+  
       if (callback) callback();
     };
+  
     const onError = (err) => {
       showErrorToast(err);
       if (callback) callback();
     };
-
+  
     $delete(
       `/api/admin/project/archive`,
       { data: projects },
@@ -145,6 +165,7 @@ export const ProjectsContextProvider = ({ children }) => {
     );
     refreshData(currentPage);
   };
+  
 
   const contextVal = {
     allProjects,

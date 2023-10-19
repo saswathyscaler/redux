@@ -28,6 +28,7 @@ const Dashboard = () => {
   let isLoaded = useSelector((state) => state.dashboard.isLoaded);
   let myPaginateData = useSelector((state) => state.dashboard.myPaginatonData);
   // console.log("🚀  myPaginateData:", myPaginateData)
+// const totalPages = useSelector((state) => state.dashboard.totalPages);
 
 
 
@@ -147,14 +148,17 @@ const Dashboard = () => {
   const onChangeShow=()=>{
     setShowCompletedProjects(!showCompletedProjects)
   }
-  console.log(myPaginateData[currentPage] )
+  // console.log(myPaginateData[currentPage] )
 
+// console.log(allProjects,"sortedProjects")
+console.log(totalPages,"total pagess")
+console.log(currentPage,"projects per pagess")
 
   return (
     <>
       <Subheader
         searchValue={searchQuery}
-        projects={allProjects}
+        projects={dashboardData}
         clearSearch={clearSearch}
         onSearch={(e) => { setSearchQuery(e.target.value) }}
         onClickNewProject={toggleShowNewProjectModal}
@@ -162,6 +166,7 @@ const Dashboard = () => {
       <main className="min-h-screen p-1 md:p-4 lg:p-5 bg-blueGray-100">
         <section className="overflow-x-auto bg-blueGray-100 shadow-sm">
           {loading ? (
+
             <LoadingPhantomTable />
           ) : (
             <Table
@@ -169,7 +174,7 @@ const Dashboard = () => {
               onClickSort={onClickSort}
               ascending={sortedBy.asc}
             >
-            { (myPaginateData[currentPage] || sortedProjects).map((project) => (
+             {  sortedProjects.map((project) => (
               <Row
                   key={project.id}
                   className="bg-white cursor-pointer hover:bg-blueGray-50"
@@ -246,15 +251,19 @@ const Dashboard = () => {
             </Table>
           )}
         </section>
-        {projectsPerPage !== "All" && totalPages !== 0 && !q && (
+
+        {projectsPerPage !== "All" && totalPages !== 0  && !q && 
+        ( 
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            goToPage={goToPage}
-            goToNextPage={goToNextPage}
-            goToPreviousPage={goToPreviousPage}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          goToPage={goToPage}
+          goToNextPage={goToNextPage}
+          goToPreviousPage={goToPreviousPage}
           />
-        )}
+          )
+        
+        }
       </main>
       {showNewProjectModal && (
         <NewProjectModal onClose={toggleShowNewProjectModal} />

@@ -6,8 +6,12 @@ const dashboardSlice = createSlice({
     items: [],
     isLoaded: false,
     myPaginatonData: {}, 
+    totalPages: 0, 
   },
   reducers: {
+    setToPages: (state, action) => {
+      state.totalPages = action.payload;
+    },
     setPrjcts: (state, action) => {
       state.items = action.payload;
       state.isLoaded = true;
@@ -26,7 +30,15 @@ const dashboardSlice = createSlice({
         [page]: data, 
       };
     },
+    removeProjectFromPage: (state, action) => {
+      const { page, projectId } = action.payload;
+      if (state.myPaginatonData[page]) {
+        state.myPaginatonData[page] = state.myPaginatonData[page].filter(
+          (project) => project.id !== projectId
+        );
+      }
+    },
   },
 });
-export const { setPrjcts, removePrjct, updateMyPaginatonData } = dashboardSlice.actions;
+export const { setPrjcts, removePrjct, updateMyPaginatonData,removeProjectFromPage ,setToPages} = dashboardSlice.actions;
 export default dashboardSlice.reducer;
