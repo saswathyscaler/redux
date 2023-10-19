@@ -23,13 +23,40 @@ const dashboardSlice = createSlice({
       );
     },
 
+    // updateMyPaginatonData: (state, action) => {
+    //   const { data, page } = action.payload;
+    //   state.myPaginatonData = {
+    //     ...state.myPaginatonData,
+    //     [page]: data, 
+    //   };
+    // },
+
+    // updateMyPaginatonData: (state, action) => {
+    //   const { data, page, projectsPerPage } = action.payload;
+
+    //   if (!state.myPaginatonData[projectsPerPage]) {
+    //     state.myPaginatonData[projectsPerPage] = {};
+    //   }
+
+    //   state.myPaginatonData[projectsPerPage][page] = data;
+    // },
+
+
+
+
     updateMyPaginatonData: (state, action) => {
-      const { data, page } = action.payload;
-      state.myPaginatonData = {
-        ...state.myPaginatonData,
-        [page]: data, 
-      };
+      const { data, page, projectsPerPage, totalPages } = action.payload;
+    
+      if (!state.myPaginatonData[projectsPerPage]) {
+        state.myPaginatonData[projectsPerPage] = {};
+      }
+    
+      state.myPaginatonData[projectsPerPage][page] = data;
+      state.myPaginatonData[projectsPerPage].totalPages = totalPages;
     },
+    
+
+
     removeProjectFromPage: (state, action) => {
       const { page, projectId } = action.payload;
       if (state.myPaginatonData[page]) {

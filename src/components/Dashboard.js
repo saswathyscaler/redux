@@ -151,8 +151,8 @@ const Dashboard = () => {
   // console.log(myPaginateData[currentPage] )
 
 // console.log(allProjects,"sortedProjects")
-console.log(totalPages,"total pagess")
-console.log(currentPage,"projects per pagess")
+// console.log(totalPages,"total pagess")
+// console.log(currentPage,"projects per pagess")
 
   return (
     <>

@@ -33,39 +33,54 @@ export const ProjectsContextProvider = ({ children }) => {
   const [projects, setProjects] = useState([]);
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [projectsPerPage, setProjectsPerPage] = useState("");
+  const [projectsPerPage, setProjectsPerPage] = useState("20"); 
+  
   const [showComplete, setShowComplete] = useState("");
   const [allProjects, setAllProjects] = useState([]);
 
   const dispatch = useDispatch();
   const dashboardData = useSelector((state) => state.dashboard.items);
   let myPaginateData = useSelector((state) => state.dashboard.myPaginatonData);
+  let TotPages = useSelector((state) => state.dashboard.myPaginatonData);
+  
+  console.log("🚀 ~ Total Pages:", TotPages[projectsPerPage]?.totalPages);
+
+
+
+  // console.log("🚀 ~ myPaginateData:", myPaginateData)
  let tPages = useSelector ((state)=>state.dashboard.totalPages)
+//  console.log("projectPerPage...............", tPages);
+
+
+// console.log("🚀 ~ myPaginateData:", myPaginateData[projectsPerPage])
+
 
 
 
   const refreshData = (page = 1) => {
 
-    const existingPageData = myPaginateData[page];
+    const existingPageData = myPaginateData[projectsPerPage]?.[page];
     if (existingPageData?.length ) {
       console.log("existingggggg");
       setProjects(existingPageData);
-      setTotalPages(tPages);
-      console.log(page,"page")
+      setTotalPages(TotPages[projectsPerPage]?.totalPages);
+      // console.log(page,"page")
       setCurrentPage(page > totalPages ? 1 : page);
       setLoading(false);
 
     } else {
-      console.log("not existing");
+      // console.log("not existing");
+
       const onSuccess = (response) => {
         const { data, totalPages } = response;
         setProjects(data);
         setTotalPages(totalPages);
         setCurrentPage(page > totalPages ? 1 : page);
-        dispatch(updateMyPaginatonData({ data, page }));
+        dispatch(updateMyPaginatonData({ data, page, projectsPerPage ,totalPages:totalPages}));
+
+        // dispatch(updateMyPaginatonData({ data, page }));
         dispatch(setToPages(totalPages));
         setLoading(false);
-        // console.log("projectPerPage...............", page);
       };
       const onError = (err) => {
         showErrorToast(err);
@@ -84,7 +99,7 @@ export const ProjectsContextProvider = ({ children }) => {
 
       } 
       else {
-        console.log("Else block is executing....")
+        // console.log("Else block is executing....")
         get(
           `/api/projects?page=${page}&projectsPerPage=${
             projectsPerPage === "" ? 20 : projectsPerPage
