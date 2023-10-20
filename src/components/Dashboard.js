@@ -24,8 +24,7 @@ const Dashboard = () => {
   const clearSearch = () => setSearchQuery("");
 
 
-  let dashboardData = useSelector((state) => state.dashboard.items);
-  
+  let dashboardData = useSelector((state) => state.dashboard.items);  
 
   const columnConfig = [
     { key: "hasNewEvents", displayName: "", width: "0%" },

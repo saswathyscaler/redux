@@ -46,16 +46,15 @@ export const ProjectsContextProvider = ({ children }) => {
 
 
 
-  const refreshData = (page = 1) => {
-    const existingPageData = myPaginateData[projectsPerPage]?.[page];
-    if (existingPageData?.length ) {
+  const refreshData = (page = 1,formarchive=false) => {
+    const existingPageData = myPaginateData[projectsPerPage]?.[page];    
+    if (existingPageData?.length && !formarchive ) {
       setProjects(existingPageData);
       setTotalPages(TotPages[projectsPerPage]?.totalPages);
       setCurrentPage(page > totalPages ? 1 : page);
       setLoading(false);
-
     } else {
-
+      console.log("coming to else");
       const onSuccess = (response) => {
         const { data, totalPages } = response;
         setProjects(data);
@@ -81,6 +80,7 @@ export const ProjectsContextProvider = ({ children }) => {
 
       } 
       else {
+      console.log("coming to else5555555555555");
         get(
           `/api/projects?page=${page}&projectsPerPage=${
             projectsPerPage === "" ? 20 : projectsPerPage
@@ -136,31 +136,23 @@ export const ProjectsContextProvider = ({ children }) => {
 
   const deleteProject = (projects, callback) => {
     console.log(projectsPerPage,"projectcts per page ")
-    
-    console.log(myPaginateData[projectsPerPage]?.[currentPage])
     const onSuccess = (newProject) => {
-
       dispatch(removeProjectFromPage({ page: currentPage, projectId: projects, projectsPerPage }));
       setProjects(myPaginateData[projectsPerPage]?.[currentPage]);
-
       if (callback) {callback()
-      console.log("printfeef")
       };
-    };
-  
+    }; 
     const onError = (err) => {  
       showErrorToast(err);
       if (callback) callback();
     };
-  
     $delete(
       `/api/admin/project/archive`,
       { data: projects },
       onSuccess,
       onError
     );
-    refreshData(currentPage)
-
+    refreshData(currentPage,true);
   };
   
 
