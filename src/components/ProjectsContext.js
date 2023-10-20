@@ -43,33 +43,18 @@ export const ProjectsContextProvider = ({ children }) => {
   let myPaginateData = useSelector((state) => state.dashboard.myPaginatonData);
   let TotPages = useSelector((state) => state.dashboard.myPaginatonData);
   
-  console.log("🚀 ~ Total Pages:", TotPages[projectsPerPage]?.totalPages);
-
-
-
-  // console.log("🚀 ~ myPaginateData:", myPaginateData)
- let tPages = useSelector ((state)=>state.dashboard.totalPages)
-//  console.log("projectPerPage...............", tPages);
-
-
-// console.log("🚀 ~ myPaginateData:", myPaginateData[projectsPerPage])
-
 
 
 
   const refreshData = (page = 1) => {
-
     const existingPageData = myPaginateData[projectsPerPage]?.[page];
     if (existingPageData?.length ) {
-      console.log("existingggggg");
       setProjects(existingPageData);
       setTotalPages(TotPages[projectsPerPage]?.totalPages);
-      // console.log(page,"page")
       setCurrentPage(page > totalPages ? 1 : page);
       setLoading(false);
 
     } else {
-      // console.log("not existing");
 
       const onSuccess = (response) => {
         const { data, totalPages } = response;
@@ -77,9 +62,6 @@ export const ProjectsContextProvider = ({ children }) => {
         setTotalPages(totalPages);
         setCurrentPage(page > totalPages ? 1 : page);
         dispatch(updateMyPaginatonData({ data, page, projectsPerPage ,totalPages:totalPages}));
-
-        // dispatch(updateMyPaginatonData({ data, page }));
-        dispatch(setToPages(totalPages));
         setLoading(false);
       };
       const onError = (err) => {
@@ -99,7 +81,6 @@ export const ProjectsContextProvider = ({ children }) => {
 
       } 
       else {
-        // console.log("Else block is executing....")
         get(
           `/api/projects?page=${page}&projectsPerPage=${
             projectsPerPage === "" ? 20 : projectsPerPage
@@ -110,6 +91,7 @@ export const ProjectsContextProvider = ({ children }) => {
       }
     }
   };
+
   const getAllProject = () => {
     if (dashboardData?.length) {
       setAllProjects(dashboardData)
@@ -135,14 +117,11 @@ export const ProjectsContextProvider = ({ children }) => {
   useEffect(() => {
     getAllProject();
     refreshData(currentPage);
-  }, [showComplete]);
+  }, [showComplete,currentPage]);
 
   const submitNewProject = (newProjectData, callback) => {
     const onSuccess = (newProject) => {
-      // setProjects((prev) => [newProject, ...prev]);
       dispatch(setPrjcts([...dashboardData, newProject]));
-
-
       if (callback) callback();
     };
     const onError = (err) => {
@@ -154,20 +133,22 @@ export const ProjectsContextProvider = ({ children }) => {
     setTimeout(() => refreshData(), 1000);
   };
 
-  // * TODO: remove archieved projects from the store
 
   const deleteProject = (projects, callback) => {
-    // console.log(myPaginateData[currentPage])
+    console.log(projectsPerPage,"projectcts per page ")
+    
+    console.log(myPaginateData[projectsPerPage]?.[currentPage])
     const onSuccess = (newProject) => {
-      dispatch(removePrjct(projects));
-      dispatch(removeProjectFromPage({ page: currentPage, projectId: projects }));
-      const existingPageData = myPaginateData[currentPage];
-      setProjects(existingPageData)
-  
-      if (callback) callback();
+
+      dispatch(removeProjectFromPage({ page: currentPage, projectId: projects, projectsPerPage }));
+      setProjects(myPaginateData[projectsPerPage]?.[currentPage]);
+
+      if (callback) {callback()
+      console.log("printfeef")
+      };
     };
   
-    const onError = (err) => {
+    const onError = (err) => {  
       showErrorToast(err);
       if (callback) callback();
     };
@@ -178,7 +159,8 @@ export const ProjectsContextProvider = ({ children }) => {
       onSuccess,
       onError
     );
-    refreshData(currentPage);
+    refreshData(currentPage)
+
   };
   
 

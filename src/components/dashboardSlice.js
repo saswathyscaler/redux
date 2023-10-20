@@ -23,27 +23,6 @@ const dashboardSlice = createSlice({
       );
     },
 
-    // updateMyPaginatonData: (state, action) => {
-    //   const { data, page } = action.payload;
-    //   state.myPaginatonData = {
-    //     ...state.myPaginatonData,
-    //     [page]: data, 
-    //   };
-    // },
-
-    // updateMyPaginatonData: (state, action) => {
-    //   const { data, page, projectsPerPage } = action.payload;
-
-    //   if (!state.myPaginatonData[projectsPerPage]) {
-    //     state.myPaginatonData[projectsPerPage] = {};
-    //   }
-
-    //   state.myPaginatonData[projectsPerPage][page] = data;
-    // },
-
-
-
-
     updateMyPaginatonData: (state, action) => {
       const { data, page, projectsPerPage, totalPages } = action.payload;
     
@@ -58,13 +37,17 @@ const dashboardSlice = createSlice({
 
 
     removeProjectFromPage: (state, action) => {
-      const { page, projectId } = action.payload;
-      if (state.myPaginatonData[page]) {
-        state.myPaginatonData[page] = state.myPaginatonData[page].filter(
+      const { page, projectId, projectsPerPage } = action.payload;
+      console.log(action.payload,"action.payload")
+      if (state.myPaginatonData[projectsPerPage] && state.myPaginatonData[projectsPerPage][page]) {
+        state.myPaginatonData[projectsPerPage][page] = state.myPaginatonData[projectsPerPage][page].filter(
           (project) => project.id !== projectId
         );
+        console.log(state.myPaginatonData[projectsPerPage][page],"state.myPaginatonData[projectsPerPage][page]")
       }
+      state.items = state.items.filter((project) => project.id !== projectId);
     },
+
   },
 });
 export const { setPrjcts, removePrjct, updateMyPaginatonData,removeProjectFromPage ,setToPages} = dashboardSlice.actions;

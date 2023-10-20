@@ -25,12 +25,7 @@ const Dashboard = () => {
 
 
   let dashboardData = useSelector((state) => state.dashboard.items);
-  let isLoaded = useSelector((state) => state.dashboard.isLoaded);
-  let myPaginateData = useSelector((state) => state.dashboard.myPaginatonData);
-  // console.log("🚀  myPaginateData:", myPaginateData)
-// const totalPages = useSelector((state) => state.dashboard.totalPages);
-
-
+  
 
   const columnConfig = [
     { key: "hasNewEvents", displayName: "", width: "0%" },
@@ -148,11 +143,7 @@ const Dashboard = () => {
   const onChangeShow=()=>{
     setShowCompletedProjects(!showCompletedProjects)
   }
-  // console.log(myPaginateData[currentPage] )
 
-// console.log(allProjects,"sortedProjects")
-// console.log(totalPages,"total pagess")
-// console.log(currentPage,"projects per pagess")
 
   return (
     <>
